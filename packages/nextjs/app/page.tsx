@@ -23,14 +23,17 @@ const Home: NextPage = () => {
 
   const handleSubmitProposal = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await writeProposalContractAsync({
+    const tx = await writeProposalContractAsync({
       functionName: "submitProposal",
       args: [proposalTitle, proposalDescription],
     });
-    setProposalTitle("");
-    setProposalDescription("");
-    toast.success("Proposal submitted successfully");
-    refetchProposals();
+
+    if (tx) {
+      setProposalTitle("");
+      setProposalDescription("");
+      toast.success("Proposal submitted successfully");
+      refetchProposals();
+    }
   };
 
   return (

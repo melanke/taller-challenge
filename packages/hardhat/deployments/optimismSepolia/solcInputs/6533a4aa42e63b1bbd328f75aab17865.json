@@ -1,0 +1,36 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "contracts/ProposalContract.sol": {
+      "content": "//SPDX-License-Identifier: MIT\r\npragma solidity >=0.8.0 <0.9.0;\r\n\r\n/**\r\n * A smart contract that allows users to create proposals and retrieve a list of all proposals.\r\n * @author BuidlGuidl\r\n */\r\ncontract ProposalContract {\r\n    struct Proposal {\r\n        string title;\r\n        string description;\r\n    }\r\n\r\n    // State Variables\r\n    mapping(uint256 => Proposal) public proposals; // starts at 0\r\n    uint256 public totalCounter = 0;\r\n\r\n    // Events: a way to emit log statements from smart contract that can be listened to by external parties\r\n    event ProposalSubmitted(uint256 indexed id, string title, string description);\r\n\r\n    // Constructor: Called once on contract deployment\r\n    // Check packages/hardhat/deploy/00_deploy_your_contract.ts\r\n    constructor() {\r\n    }\r\n\r\n    /**\r\n     * Function that allows anyone to send a proposal\r\n     *\r\n     * @param _title (string memory) - new proposal title to save on the contract\r\n     */\r\n    function submitProposal(string memory _title, string memory _description) public {\r\n        proposals[totalCounter] = Proposal(_title, _description);\r\n        totalCounter += 1;\r\n\r\n        // emit: keyword used to trigger an event\r\n        emit ProposalSubmitted(totalCounter, _title, _description);\r\n    }\r\n\r\n    function getProposals() public view returns (Proposal[] memory) {\r\n        Proposal[] memory proposalsList = new Proposal[](totalCounter);\r\n        for (uint256 i = 0; i < totalCounter; i++) {\r\n            proposalsList[i] = proposals[i];\r\n        }\r\n        return proposalsList;\r\n    }\r\n}\r\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 200
+    },
+    "evmVersion": "paris",
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}
