@@ -1,71 +1,78 @@
 "use client";
 
-import Link from "next/link";
+import { useState } from "react";
 import type { NextPage } from "next";
-import { useAccount } from "wagmi";
-import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { Address } from "~~/components/scaffold-eth";
+import { toast } from "react-hot-toast";
+import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
 const Home: NextPage = () => {
-  const { address: connectedAddress } = useAccount();
+  const [proposalTitle, setProposalTitle] = useState("");
+  const [proposalDescription, setProposalDescription] = useState("");
+  const {
+    data: proposals,
+    isLoading: isLoadingProposals,
+    refetch: refetchProposals,
+  } = useScaffoldReadContract({
+    contractName: "ProposalContract",
+    functionName: "getProposals",
+  });
+
+  const { writeContractAsync: writeProposalContractAsync } = useScaffoldWriteContract({
+    contractName: "ProposalContract",
+  });
+
+  const handleSubmitProposal = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await writeProposalContractAsync({
+      functionName: "submitProposal",
+      args: [proposalTitle, proposalDescription],
+    });
+    setProposalTitle("");
+    setProposalDescription("");
+    toast.success("Proposal submitted successfully");
+    refetchProposals();
+  };
 
   return (
-    <>
-      <div className="flex items-center flex-col grow pt-10">
-        <div className="px-5">
-          <h1 className="text-center">
-            <span className="block text-2xl mb-2">Welcome to</span>
-            <span className="block text-4xl font-bold">Scaffold-ETH 2</span>
-          </h1>
-          <div className="flex justify-center items-center space-x-2 flex-col">
-            <p className="my-2 font-medium">Connected Address:</p>
-            <Address address={connectedAddress} />
-          </div>
-
-          <p className="text-center text-lg">
-            Get started by editing{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/nextjs/app/page.tsx
-            </code>
-          </p>
-          <p className="text-center text-lg">
-            Edit your smart contract{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              YourContract.sol
-            </code>{" "}
-            in{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/hardhat/contracts
-            </code>
-          </p>
-        </div>
-
-        <div className="grow bg-base-300 w-full mt-16 px-8 py-12">
-          <div className="flex justify-center items-center gap-12 flex-col md:flex-row">
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <BugAntIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Tinker with your smart contract using the{" "}
-                <Link href="/debug" passHref className="link">
-                  Debug Contracts
-                </Link>{" "}
-                tab.
+    <div className="flex items-center flex-col grow pt-10">
+      <h1 className="text-4xl font-bold">Proposals</h1>
+      <form className="flex flex-col gap-4 m-8 p-8 bg-base-100" onSubmit={handleSubmitProposal}>
+        <input
+          className="border border-1 border-primary p-2"
+          type="text"
+          placeholder="Proposal Title"
+          value={proposalTitle}
+          onChange={e => setProposalTitle(e.target.value)}
+        />
+        <input
+          className="border border-1 border-primary p-2"
+          type="text"
+          placeholder="Proposal Description"
+          value={proposalDescription}
+          onChange={e => setProposalDescription(e.target.value)}
+        />
+        <button className="bg-primary rounded-md px-4 py-2" type="submit">
+          Submit Proposal
+        </button>
+      </form>
+      <div className="flex flex-col gap-4">
+        <h2 className="text-2xl font-bold">Proposals</h2>
+        <div className="flex flex-col gap-1">
+          {isLoadingProposals ? (
+            <p>Loading...</p>
+          ) : (
+            proposals?.map((proposal: { title: string; description: string }, index: number) => (
+              <p key={index} className="p-2 border-b border-base-100">
+                <h3 className="text-lg font-bold">
+                  #{index} - {proposal.title}
+                </h3>
+                <p>{proposal.description}</p>
               </p>
-            </div>
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <MagnifyingGlassIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Explore your local transactions with the{" "}
-                <Link href="/blockexplorer" passHref className="link">
-                  Block Explorer
-                </Link>{" "}
-                tab.
-              </p>
-            </div>
-          </div>
+            ))
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

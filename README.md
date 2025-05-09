@@ -25,3 +25,31 @@ Create a simple decentralized application (dApp) that allows users to submit and
 
     - Use Web3.js or Ethers.js to connect the frontend to the smart contract.
     - Ensure that the application can read from and write to the smart contract.
+
+## Running Locally
+
+### Start the Chain
+
+```sh
+yarn chain
+```
+
+### Deploy the Contract
+
+```sh
+yarn deploy
+```
+
+### Start the NextJS dev server
+
+```sh
+yarn start
+```
+
+## Run Unit Tests
+
+```sh
+yarn test
+```
+
+felipe.kautzmann@tallertechnologies.net
