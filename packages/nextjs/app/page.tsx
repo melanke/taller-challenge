@@ -65,12 +65,12 @@ const Home: NextPage = () => {
             <p>Loading...</p>
           ) : (
             proposals?.map((proposal: { title: string; description: string }, index: number) => (
-              <p key={index} className="p-2 border-b border-base-100">
+              <div key={index} className="p-2 border-b border-base-100">
                 <h3 className="text-lg font-bold">
                   #{index} - {proposal.title}
                 </h3>
                 <p>{proposal.description}</p>
-              </p>
+              </div>
             ))
           )}
         </div>

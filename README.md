@@ -51,5 +51,3 @@ yarn start
 ```sh
 yarn test
 ```
-
-felipe.kautzmann@tallertechnologies.net
